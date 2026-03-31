@@ -1,0 +1,143 @@
+{
+  "project_info": {
+    "project_number": "697427162142",
+    "project_id": "zenplus-2b69f",
+    "storage_bucket": "zenplus-2b69f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:697427162142:android:782225a2b0f34f456baa0f",
+        "android_client_info": {
+          "package_name": "com.wtipartner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoqmvxFauNZE_LPMThq56t0-U1TRp9FPE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:697427162142:android:a2e301571e5e788a6baa0f",
+        "android_client_info": {
+          "package_name": "com.zenpartner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoqmvxFauNZE_LPMThq56t0-U1TRp9FPE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:697427162142:android:a15e2b9b90e3bcf46baa0f",
+        "android_client_info": {
+          "package_name": "com.zenpartners"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoqmvxFauNZE_LPMThq56t0-U1TRp9FPE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:697427162142:android:8ba0fc33cbdc2e946baa0f",
+        "android_client_info": {
+          "package_name": "com.zenplus"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoqmvxFauNZE_LPMThq56t0-U1TRp9FPE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:697427162142:android:554420242dd6b99d6baa0f",
+        "android_client_info": {
+          "package_name": "com.zenplusdriver"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoqmvxFauNZE_LPMThq56t0-U1TRp9FPE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:697427162142:android:638e53ea9b02a0fe6baa0f",
+        "android_client_info": {
+          "package_name": "com.zenplusmac"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoqmvxFauNZE_LPMThq56t0-U1TRp9FPE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:697427162142:android:2a33619a5e1fa8266baa0f",
+        "android_client_info": {
+          "package_name": "com.zenpluspartner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoqmvxFauNZE_LPMThq56t0-U1TRp9FPE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
