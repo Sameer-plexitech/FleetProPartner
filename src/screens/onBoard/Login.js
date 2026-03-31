@@ -16,24 +16,58 @@ import { fontPixel, widthPixel } from '../../utility/fonts';
 import CommonInput from '../../components/CommonInput';
 
 const Login = () => {
+  const Container = Platform.OS === 'ios' ? KeyboardAvoidingView : View;
+  const scrollRef = React.useRef(null);
+  const [keyboardHeight, setKeyboardHeight] = React.useState(0);
+
+  React.useEffect(() => {
+    if (Platform.OS !== 'android') {
+      return undefined;
+    }
+
+    const showSub = Keyboard.addListener('keyboardDidShow', event => {
+      setKeyboardHeight(event.endCoordinates?.height || 0);
+      setTimeout(() => {
+        scrollRef.current?.scrollToEnd({ animated: true });
+      }, 120);
+    });
+    const hideSub = Keyboard.addListener('keyboardDidHide', () => {
+      setKeyboardHeight(0);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
   return (
-    <KeyboardAvoidingView
+    <Container
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      {...(Platform.OS === 'ios' ? { behavior: 'padding' } : {})}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <LinearGradient colors={['#000088', '#6420AA']} style={styles.gradient}>
           <ScrollView
+            ref={scrollRef}
             style={styles.scroll}
-            contentContainerStyle={styles.scrollContent}
+            contentContainerStyle={[
+              styles.scrollContent,
+              Platform.OS === 'android' && keyboardHeight > 0
+                ? { paddingBottom: keyboardHeight + 16 }
+                : null,
+            ]}
             keyboardShouldPersistTaps="handled"
+            keyboardDismissMode={
+              Platform.OS === 'ios' ? 'interactive' : 'on-drag'
+            }
             bounces={false}
             contentInsetAdjustmentBehavior="never"
             automaticallyAdjustContentInsets={false}
           >
             <Image source={require('../../assets/images/Logo.png')} />
 
-            {_getVerticalPadding(65)}
+            {_getVerticalPadding(24)}
 
             <View style={styles.titleWrap}>
               <Text style={styles.title}>Get Started with FleetPro</Text>
@@ -62,7 +96,7 @@ const Login = () => {
           </ScrollView>
         </LinearGradient>
       </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+    </Container>
   );
 };
 
