@@ -62,6 +62,13 @@ export const _getVerticalPadding = padding => (
     <View style={{ height: heightPixel(padding) }} />
 );
 
+export const truncateText = (text, maxLength = 50) => {
+  if (!text) return '';
+
+  return text.length > maxLength
+    ? text.substring(0, maxLength).trim() + '...'
+    : text;
+};
 
 export const _getValidateText = (text, center) => {
     return (

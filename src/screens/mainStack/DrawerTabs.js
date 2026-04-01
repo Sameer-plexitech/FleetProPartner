@@ -2,6 +2,8 @@ import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import BottomTabs from './BottomTabs';
 import CustomDrawerContent from './sidebar/CustomDrawerContent';
+import TransactionHistory from '../transactionHistory/TransactionHistory';
+import Settlements from '../settlements/Settlements';
 
 const Drawer = createDrawerNavigator();
 const renderDrawerContent = props => <CustomDrawerContent {...props} />;
@@ -21,6 +23,8 @@ export default function DrawerTabs() {
       }}
     >
       <Drawer.Screen name="BottomTabs" component={BottomTabs} />
+      <Drawer.Screen name="Settlements" component={Settlements} />
+      <Drawer.Screen name="TransactionHistory" component={TransactionHistory} />
     </Drawer.Navigator>
   );
 }

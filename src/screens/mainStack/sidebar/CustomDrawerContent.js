@@ -13,15 +13,23 @@ const TAB_ROUTE_BY_MENU_KEY = {
   dashboard: 'Home',
   trips: 'Trips',
 };
+const DRAWER_ROUTE_BY_MENU_KEY = {
+  settlements: 'Settlements',
+  transactionHistory: 'TransactionHistory',
+};
 
 const CustomDrawerContent = ({ navigation, ...rest }) => {
   const insets = useSafeAreaInsets();
 
   const handleMenuPress = menuItem => {
     const tabRoute = TAB_ROUTE_BY_MENU_KEY[menuItem.key];
+    const drawerRoute = DRAWER_ROUTE_BY_MENU_KEY[menuItem.key];
 
     if (tabRoute) {
       navigation.navigate('BottomTabs', { screen: tabRoute });
+    }
+    if (drawerRoute) {
+      navigation.navigate(drawerRoute);
     }
 
     navigation.closeDrawer();
@@ -61,7 +69,13 @@ const CustomDrawerContent = ({ navigation, ...rest }) => {
       </DrawerContentScrollView>
 
       <View
-        style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 12), paddingHorizontal:widthPixel(22) }]}
+        style={[
+          styles.footer,
+          {
+            paddingBottom: Math.max(insets.bottom, 12),
+            paddingHorizontal: widthPixel(22),
+          },
+        ]}
       >
         <TouchableOpacity
           activeOpacity={0.84}

@@ -7,7 +7,7 @@ export const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   header: {
-    height: heightPixel(62),
+    height: heightPixel(70),
     paddingHorizontal: widthPixel(10),
     flexDirection: 'row',
     alignItems: 'center',
