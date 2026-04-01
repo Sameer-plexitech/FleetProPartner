@@ -17,6 +17,7 @@ const DRAWER_ROUTE_BY_MENU_KEY = {
   settlements: 'Settlements',
   transactionHistory: 'TransactionHistory',
   attendance: 'Attendance',
+  contactUs: 'ContactUs',
 };
 
 const CustomDrawerContent = ({ navigation, ...rest }) => {
