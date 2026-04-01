@@ -16,6 +16,7 @@ const TAB_ROUTE_BY_MENU_KEY = {
 const DRAWER_ROUTE_BY_MENU_KEY = {
   settlements: 'Settlements',
   transactionHistory: 'TransactionHistory',
+  attendance: 'Attendance',
 };
 
 const CustomDrawerContent = ({ navigation, ...rest }) => {

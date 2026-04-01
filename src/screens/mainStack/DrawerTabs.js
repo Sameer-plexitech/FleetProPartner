@@ -4,6 +4,7 @@ import BottomTabs from './BottomTabs';
 import CustomDrawerContent from './sidebar/CustomDrawerContent';
 import TransactionHistory from '../transactionHistory/TransactionHistory';
 import Settlements from '../settlements/Settlements';
+import Attendance from '../attendance/Attendance';
 
 const Drawer = createDrawerNavigator();
 const renderDrawerContent = props => <CustomDrawerContent {...props} />;
@@ -25,6 +26,7 @@ export default function DrawerTabs() {
       <Drawer.Screen name="BottomTabs" component={BottomTabs} />
       <Drawer.Screen name="Settlements" component={Settlements} />
       <Drawer.Screen name="TransactionHistory" component={TransactionHistory} />
+      <Drawer.Screen name="Attendance" component={Attendance} />
     </Drawer.Navigator>
   );
 }
