@@ -1,18 +1,12 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { StyleSheet, Text, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import Home from '../home/Home';
 import Trips from '../trips/Trips';
+import Profile from '../profile/Profile';
 import { fontPixel, heightPixel } from '../../utility/fonts';
 
 const Tab = createBottomTabNavigator();
-
-const Profile = () => (
-  <View style={styles.profileContainer}>
-    <Text>Profile Screen</Text>
-  </View>
-);
 
 const tabScreenOptions = ({ route }) => ({
   headerShown: false,
@@ -59,11 +53,3 @@ export default function BottomTabs() {
     </Tab.Navigator>
   );
 }
-
-const styles = StyleSheet.create({
-  profileContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
