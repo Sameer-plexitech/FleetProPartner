@@ -8,17 +8,58 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import React from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import { _getVerticalPadding } from '../../utility/Helper';
-import { fontPixel, widthPixel } from '../../utility/fonts';
+import { fontPixel, heightPixel, widthPixel } from '../../utility/fonts';
 import CommonInput from '../../components/CommonInput';
+import { useNavigation } from '@react-navigation/native';
 
 const Login = () => {
   const Container = Platform.OS === 'ios' ? KeyboardAvoidingView : View;
   const scrollRef = React.useRef(null);
   const [keyboardHeight, setKeyboardHeight] = React.useState(0);
+  const [mobileNumber, setMobileNumber] = React.useState('');
+  const [mobileError, setMobileError] = React.useState('');
+  const navigation = useNavigation();
+
+  const validateMobileNumber = number => {
+    if (!number) {
+      return 'Mobile number is required';
+    }
+
+    if (number.length !== 10) {
+      return 'Mobile number must be exactly 10 digits';
+    }
+
+    return '';
+  };
+
+  const handleMobileChange = text => {
+    const formattedNumber = text.replace(/\D/g, '').slice(0, 10);
+    setMobileNumber(formattedNumber);
+
+    if (mobileError) {
+      setMobileError(validateMobileNumber(formattedNumber));
+    }
+  };
+
+  const handleLoginPress = () => {
+    const error = validateMobileNumber(mobileNumber);
+
+    if (error) {
+      setMobileError(error);
+      return;
+    }
+
+    setMobileError('');
+    Keyboard.dismiss();
+
+    // navigation.navigate('OtpVerification', { mobileNumber });
+    navigation.navigate('DrawerTabs');
+  };
 
   React.useEffect(() => {
     if (Platform.OS !== 'android') {
@@ -91,7 +132,30 @@ const Login = () => {
                 placeholder="Enter your number"
                 iconName="phone"
                 keyboardType="phone-pad"
+                value={mobileNumber}
+                onChangeText={handleMobileChange}
+                maxLength={10}
               />
+
+              {mobileError ? (
+                <Text style={styles.errorText}>{mobileError}</Text>
+              ) : null}
+
+              <TouchableOpacity
+                style={styles.loginButton}
+                onPress={handleLoginPress}
+              >
+                <Text style={styles.loginButtonText}>Login</Text>
+              </TouchableOpacity>
+
+              <View style={styles.footerWrap}>
+                <Text style={styles.footerText}>Powered by PLEXITECH</Text>
+                <Text style={styles.footerText}>
+                  Copyright 2026 Fleet Pro. Privacy Policy
+                </Text>
+              </View>
+
+              {_getVerticalPadding(20)}
             </View>
           </ScrollView>
         </LinearGradient>
@@ -105,6 +169,7 @@ export default Login;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'flex-end',
   },
   gradient: {
     flex: 1,
@@ -114,7 +179,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-end',
     alignItems: 'center',
   },
   titleWrap: {
@@ -133,5 +198,31 @@ const styles = StyleSheet.create({
   formWrap: {
     width: '100%',
     paddingHorizontal: widthPixel(25),
+  },
+  errorText: {
+    color: '#FFB4B4',
+    fontSize: fontPixel(12),
+    marginTop: 2,
+    marginBottom: 8,
+  },
+  loginButton: {
+    backgroundColor: 'white',
+    height: heightPixel(50),
+    borderRadius: widthPixel(8),
+  },
+  loginButtonText: {
+    color: 'black',
+    fontSize: fontPixel(16),
+    fontWeight: '700',
+    textAlign: 'center',
+    lineHeight: heightPixel(50),
+  },
+  footerWrap: {
+    marginTop: heightPixel(20),
+    alignItems: 'center',
+  },
+  footerText: {
+    color: 'white',
+    fontSize: fontPixel(12),
   },
 });

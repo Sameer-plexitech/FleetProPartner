@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { LogBox, Platform, StatusBar, StyleSheet, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import RootContainer from './src/screens/RootContainer';
 
@@ -12,10 +14,14 @@ const App = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      {showStatusBar && <StatusBar barStyle={'dark-content'} />}
-      <RootContainer />
-    </View>
+    <GestureHandlerRootView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+        <View style={styles.container}>
+          {showStatusBar && <StatusBar barStyle={'dark-content'} />}
+          <RootContainer />
+        </View>
+      </SafeAreaView>
+    </GestureHandlerRootView>
   );
 };
 

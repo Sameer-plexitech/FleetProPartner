@@ -4,9 +4,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 // import OnBoardContainer from './OnBoardContainer';
 import Splash from './onBoard/Splash';
-import MainStack from './MainStack';
 import { View, Text } from 'react-native';
 import OnBoardContainer from './onBoard/OnBoardContainer';
+import DrawerTabs from './mainStack/DrawerTabs';
 
 const Stack = createNativeStackNavigator();
 
@@ -43,7 +43,7 @@ export default function RootContainer() {
         initialRouteName={initialRoute}
       >
         <Stack.Screen name="onBoard" component={OnBoardContainer} />
-        <Stack.Screen name="MainStack" component={MainStack} />
+        <Stack.Screen name="DrawerTabs" component={DrawerTabs} />
       </Stack.Navigator>
     </NavigationContainer>
   );
