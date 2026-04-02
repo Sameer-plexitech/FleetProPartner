@@ -6,6 +6,8 @@ import TransactionHistory from '../transactionHistory/TransactionHistory';
 import Settlements from '../settlements/Settlements';
 import Attendance from '../attendance/Attendance';
 import ContactUs from '../contactUs/ContactUs';
+import CollectPayment from '../collectPayment/CollectPayment';
+import WorkSchedule from '../workSchedule/WorkSchedule';
 
 const Drawer = createDrawerNavigator();
 const renderDrawerContent = props => <CustomDrawerContent {...props} />;
@@ -29,6 +31,8 @@ export default function DrawerTabs() {
       <Drawer.Screen name="TransactionHistory" component={TransactionHistory} />
       <Drawer.Screen name="Attendance" component={Attendance} />
       <Drawer.Screen name="ContactUs" component={ContactUs} />
+      <Drawer.Screen name="CollectPayment" component={CollectPayment} />
+      <Drawer.Screen name="WorkSchedule" component={WorkSchedule} />
     </Drawer.Navigator>
   );
 }

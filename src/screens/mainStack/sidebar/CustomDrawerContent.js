@@ -14,9 +14,11 @@ const TAB_ROUTE_BY_MENU_KEY = {
   trips: 'Trips',
 };
 const DRAWER_ROUTE_BY_MENU_KEY = {
+  collectPayment: 'CollectPayment',
   settlements: 'Settlements',
   transactionHistory: 'TransactionHistory',
   attendance: 'Attendance',
+  workSchedule: 'WorkSchedule',
   contactUs: 'ContactUs',
 };
 
