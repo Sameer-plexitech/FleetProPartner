@@ -24,7 +24,10 @@ const WorkSchedule = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
-        <WorkRosterCard roster={WORK_ROSTER} onEditPress={() => null} />
+        <WorkRosterCard
+          roster={WORK_ROSTER}
+          onEditPress={() => navigation.navigate('TemporarySurrenderRequest')}
+        />
 
           {_getVerticalPadding(18)}
 

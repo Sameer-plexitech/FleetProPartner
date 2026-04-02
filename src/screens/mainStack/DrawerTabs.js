@@ -8,6 +8,7 @@ import Attendance from '../attendance/Attendance';
 import ContactUs from '../contactUs/ContactUs';
 import CollectPayment from '../collectPayment/CollectPayment';
 import WorkSchedule from '../workSchedule/WorkSchedule';
+import TemporarySurrenderRequest from '../workSchedule/TemporarySurrenderRequest';
 
 const Drawer = createDrawerNavigator();
 const renderDrawerContent = props => <CustomDrawerContent {...props} />;
@@ -33,6 +34,11 @@ export default function DrawerTabs() {
       <Drawer.Screen name="ContactUs" component={ContactUs} />
       <Drawer.Screen name="CollectPayment" component={CollectPayment} />
       <Drawer.Screen name="WorkSchedule" component={WorkSchedule} />
+      <Drawer.Screen
+        name="TemporarySurrenderRequest"
+        component={TemporarySurrenderRequest}
+        options={{ drawerItemStyle: { display: 'none' } }}
+      />
     </Drawer.Navigator>
   );
 }
