@@ -32,13 +32,20 @@ const openAppSettings = () => {
   Linking.openSettings().catch(() => null);
 };
 
-const { AudioRecorderModule } = NativeModules;
+const getAudioRecorderModule = () =>
+  NativeModules.AudioRecorderModule || NativeModules.AudioRecorder || null;
+
+const toMs = value => {
+  const parsedValue = Number(value);
+  return Number.isFinite(parsedValue) ? parsedValue : 0;
+};
 
 const TemporarySurrenderRequest = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const recordingTimerRef = React.useRef(null);
   const recordingStartedAtRef = React.useRef(0);
+  const playbackTimerRef = React.useRef(null);
 
   const [startDate] = React.useState('23/06/2024');
   const [endDate] = React.useState('28/06/2024');
@@ -46,6 +53,10 @@ const TemporarySurrenderRequest = () => {
   const [isRecording, setIsRecording] = React.useState(false);
   const [recordingDuration, setRecordingDuration] = React.useState(0);
   const [recordedFilePath, setRecordedFilePath] = React.useState('');
+  const [isPlaybackActive, setIsPlaybackActive] = React.useState(false);
+  const [isPlaybackPaused, setIsPlaybackPaused] = React.useState(false);
+  const [playbackPosition, setPlaybackPosition] = React.useState(0);
+  const [playbackDuration, setPlaybackDuration] = React.useState(0);
 
   const clearRecordingTimer = React.useCallback(() => {
     if (recordingTimerRef.current) {
@@ -54,12 +65,94 @@ const TemporarySurrenderRequest = () => {
     }
   }, []);
 
+  const clearPlaybackTimer = React.useCallback(() => {
+    if (playbackTimerRef.current) {
+      clearInterval(playbackTimerRef.current);
+      playbackTimerRef.current = null;
+    }
+  }, []);
+
+  const syncPlaybackState = React.useCallback(
+    progress => {
+      const positionMs = toMs(progress?.currentPositionMs);
+      const durationMs = toMs(progress?.durationMs);
+      const isPlaying = Boolean(progress?.isPlaying);
+      const isPaused = Boolean(progress?.isPaused);
+
+      setPlaybackPosition(positionMs);
+      if (durationMs > 0) {
+        setPlaybackDuration(durationMs);
+      }
+      setIsPlaybackActive(isPlaying);
+      setIsPlaybackPaused(isPaused);
+
+      if (!isPlaying) {
+        clearPlaybackTimer();
+      }
+    },
+    [clearPlaybackTimer],
+  );
+
+  const pollPlaybackProgress = React.useCallback(async () => {
+    const audioModule = getAudioRecorderModule();
+    const getPlaybackProgressFn =
+      audioModule?.getPlaybackProgress || audioModule?.getCurrentPlaybackProgress;
+    if (!getPlaybackProgressFn) {
+      return;
+    }
+
+    try {
+      const progress = await getPlaybackProgressFn.call(audioModule);
+      syncPlaybackState(progress);
+    } catch (error) {
+      clearPlaybackTimer();
+      setIsPlaybackActive(false);
+    }
+  }, [clearPlaybackTimer, syncPlaybackState]);
+
+  const startPlaybackTimer = React.useCallback(() => {
+    clearPlaybackTimer();
+    playbackTimerRef.current = setInterval(() => {
+      pollPlaybackProgress();
+    }, 250);
+  }, [clearPlaybackTimer, pollPlaybackProgress]);
+
+  const stopPlaybackPreview = React.useCallback(async () => {
+    clearPlaybackTimer();
+    setIsPlaybackActive(false);
+    setIsPlaybackPaused(false);
+    setPlaybackPosition(0);
+
+    try {
+      const audioModule = getAudioRecorderModule();
+      const stopPlaybackFn = audioModule?.stopPlayback || audioModule?.stopPlaying;
+      if (stopPlaybackFn) {
+        await stopPlaybackFn.call(audioModule);
+      }
+    } catch (error) {
+      // no-op: if the native side is already stopped we can safely ignore.
+    }
+  }, [clearPlaybackTimer]);
+
+  const clearRecordingPreviewState = React.useCallback(() => {
+    setRecordedFilePath('');
+    setRecordingDuration(0);
+    setPlaybackDuration(0);
+    setPlaybackPosition(0);
+    setIsPlaybackActive(false);
+    setIsPlaybackPaused(false);
+  }, []);
+
   React.useEffect(
     () => () => {
       clearRecordingTimer();
-      AudioRecorderModule?.stopRecording?.().catch(() => null);
+      const stopPromise = getAudioRecorderModule()?.stopRecording?.();
+      if (stopPromise?.catch) {
+        stopPromise.catch(() => null);
+      }
+      stopPlaybackPreview();
     },
-    [clearRecordingTimer],
+    [clearRecordingTimer, stopPlaybackPreview],
   );
 
   const startRecordingTimer = () => {
@@ -116,7 +209,8 @@ const TemporarySurrenderRequest = () => {
   };
 
   const startRecording = async () => {
-    if (!AudioRecorderModule?.startRecording || !AudioRecorderModule?.stopRecording) {
+    const audioModule = getAudioRecorderModule();
+    if (!audioModule?.startRecording || !audioModule?.stopRecording) {
       Alert.alert('Not supported', 'Audio recording module is not available.');
       return;
     }
@@ -127,9 +221,12 @@ const TemporarySurrenderRequest = () => {
     }
 
     try {
-      const path = await AudioRecorderModule.startRecording();
+      await stopPlaybackPreview();
+      const path = await audioModule.startRecording();
       setRecordedFilePath(path || '');
       setRecordingDuration(0);
+      setPlaybackPosition(0);
+      setPlaybackDuration(0);
       setIsRecording(true);
       startRecordingTimer();
     } catch (error) {
@@ -151,18 +248,71 @@ const TemporarySurrenderRequest = () => {
 
   const stopRecording = async () => {
     try {
-      const result = await AudioRecorderModule.stopRecording();
+      const audioModule = getAudioRecorderModule();
+      if (!audioModule?.stopRecording) {
+        Alert.alert('Not supported', 'Audio recording module is not available.');
+        return;
+      }
+      const result = await audioModule.stopRecording();
       clearRecordingTimer();
       setIsRecording(false);
-      const nextPath = result?.filePath || recordedFilePath;
+      const nextPath =
+        (typeof result === 'string' ? result : result?.filePath) ||
+        recordedFilePath;
       if (nextPath) {
         setRecordedFilePath(nextPath);
       }
       if (typeof result?.durationMs === 'number') {
         setRecordingDuration(result.durationMs);
+        setPlaybackDuration(result.durationMs);
       }
+      setPlaybackPosition(0);
+      setIsPlaybackActive(false);
+      setIsPlaybackPaused(false);
     } catch (error) {
+      clearRecordingTimer();
+      setIsRecording(false);
       Alert.alert('Recording failed', 'Unable to stop recording right now.');
+    }
+  };
+
+  const handlePlaybackPress = async () => {
+    if (!recordedFilePath) {
+      return;
+    }
+    const audioModule = getAudioRecorderModule();
+    const startPlaybackFn = audioModule?.startPlayback || audioModule?.startPlaying;
+    const pausePlaybackFn = audioModule?.pausePlayback || audioModule?.pausePlaying;
+    const resumePlaybackFn =
+      audioModule?.resumePlayback || audioModule?.resumePlaying;
+
+    if (!startPlaybackFn) {
+      Alert.alert('Not supported', 'Playback is not available on this device.');
+      return;
+    }
+
+    try {
+      if (isPlaybackActive && pausePlaybackFn) {
+        const pauseProgress = await pausePlaybackFn.call(audioModule);
+        syncPlaybackState(pauseProgress);
+        return;
+      }
+
+      if (isPlaybackPaused && resumePlaybackFn) {
+        const resumeProgress = await resumePlaybackFn.call(audioModule);
+        syncPlaybackState(resumeProgress);
+        startPlaybackTimer();
+        return;
+      }
+
+      const playbackProgress = await startPlaybackFn.call(
+        audioModule,
+        recordedFilePath,
+      );
+      syncPlaybackState(playbackProgress);
+      startPlaybackTimer();
+    } catch (error) {
+      Alert.alert('Playback failed', 'Unable to play this recording right now.');
     }
   };
 
@@ -172,6 +322,31 @@ const TemporarySurrenderRequest = () => {
       return;
     }
     startRecording();
+  };
+
+  const deleteRecording = React.useCallback(async () => {
+    await stopPlaybackPreview();
+
+    const audioModule = getAudioRecorderModule();
+    const deleteRecordingFn = audioModule?.deleteRecording;
+
+    if (deleteRecordingFn && recordedFilePath) {
+      try {
+        await deleteRecordingFn.call(audioModule, recordedFilePath);
+      } catch (error) {
+        Alert.alert('Delete failed', 'Unable to delete voice note right now.');
+        return;
+      }
+    }
+
+    clearRecordingPreviewState();
+  }, [clearRecordingPreviewState, recordedFilePath, stopPlaybackPreview]);
+
+  const handleDeleteRecordingPress = () => {
+    Alert.alert('Delete Voice Note', 'Are you sure you want to delete this voice note?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Delete', style: 'destructive', onPress: deleteRecording },
+    ]);
   };
 
   return (
@@ -266,11 +441,44 @@ const TemporarySurrenderRequest = () => {
 
             <Text style={styles.remarksCounter}>{`${remarks.length}/250`}</Text>
           </View>
+          {recordedFilePath ? (
+            <View style={styles.recordingPreviewRow}>
+              <TouchableOpacity
+                activeOpacity={0.9}
+                style={styles.recordingPreviewPlayWrap}
+                onPress={handlePlaybackPress}
+              >
+                <Feather
+                  name={isPlaybackActive ? 'pause' : 'play'}
+                  size={heightPixel(10)}
+                  color="#FFFFFF"
+                />
+              </TouchableOpacity>
+
+              <View style={styles.recordingPreviewTextWrap}>
+                <Text style={styles.recordingPreviewTitle}>Voice Note</Text>
+                <Text style={styles.recordingPreviewTime}>
+                  {`${formatDuration(playbackPosition)} / ${formatDuration(
+                    playbackDuration || recordingDuration,
+                  )}`}
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                activeOpacity={0.9}
+                style={styles.recordingDeleteButton}
+                onPress={handleDeleteRecordingPress}
+              >
+                <Feather name="trash-2" size={heightPixel(12)} color="#B01212" />
+              </TouchableOpacity>
+            </View>
+          ) : null}
+
           <Text style={styles.voiceStatusText}>
             {isRecording
               ? `Recording... ${formatDuration(recordingDuration)}`
               : recordedFilePath
-                ? `Voice note saved (${formatDuration(recordingDuration)})`
+                ? 'Tap play to preview your recording'
                 : 'Tap the mic button to record a voice note'}
           </Text>
         </View>

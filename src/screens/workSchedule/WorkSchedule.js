@@ -26,10 +26,10 @@ const WorkSchedule = () => {
       >
         <WorkRosterCard
           roster={WORK_ROSTER}
-          onEditPress={() => navigation.navigate('TemporarySurrenderRequest')}
+          onEditPress={() => navigation.navigate('WorkScheduleEdit')}
         />
 
-          {_getVerticalPadding(18)}
+        {_getVerticalPadding(18)}
 
         <Text style={styles.sectionTitle}>Request For Temporary Surrender</Text>
 
@@ -45,7 +45,7 @@ const WorkSchedule = () => {
       <View
         style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 10) }]}
       >
-        <TouchableOpacity style={styles.applyButton} onPress={() => null}>
+        <TouchableOpacity style={styles.applyButton} onPress={() => navigation.navigate('TemporarySurrenderRequest')}>
           <Text style={styles.applyButtonText}>Apply</Text>
         </TouchableOpacity>
       </View>

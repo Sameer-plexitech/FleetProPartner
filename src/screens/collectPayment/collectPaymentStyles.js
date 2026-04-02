@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
     fontSize: fontPixel(20),
   },
   content: {
-    paddingHorizontal: widthPixel(8),
+    paddingHorizontal: widthPixel(26),
     paddingTop: heightPixel(22),
     paddingBottom: heightPixel(16),
     alignItems: 'center',
@@ -122,6 +122,7 @@ export const styles = StyleSheet.create({
   submitButton: {
     height: heightPixel(50),
     borderRadius: widthPixel(7),
+    width: '100%',
     backgroundColor: '#352487',
     alignItems: 'center',
     justifyContent: 'center',

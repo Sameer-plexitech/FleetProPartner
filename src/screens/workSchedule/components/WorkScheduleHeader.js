@@ -1,19 +1,30 @@
 import React from 'react';
-import { Text, TouchableOpacity } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
-import { heightPixel } from '../../../utility/fonts';
+import { heightPixel, widthPixel } from '../../../utility/fonts';
 import { styles } from '../workScheduleStyles';
 
-const WorkScheduleHeader = ({ onMenuPress, onNotificationPress }) => {
+const WorkScheduleHeader = ({
+  onMenuPress,
+  onNotificationPress,
+  title = 'Work Schedule',
+  titleStyle,
+}) => {
   return (
     <LinearGradient colors={['#000088', '#6420AA']} style={styles.header}>
       <TouchableOpacity onPress={onMenuPress} style={styles.headerIconWrap}>
         <Feather name="menu" size={heightPixel(14)} color="#FFFFFF" />
       </TouchableOpacity>
 
-      <Text style={styles.headerTitle}>Work Schedule</Text>
+      <View style={{flex:1, paddingHorizontal: widthPixel(12)}} >
+
+        <Text style={[styles.headerTitle]} numberOfLines={2}>
+          {title}
+        </Text>
+
+      </View>
 
       <TouchableOpacity
         onPress={onNotificationPress}
