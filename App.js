@@ -16,6 +16,7 @@ const App = () => {
   return (
     <GestureHandlerRootView style={styles.container}>
       <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+        <StatusBar barStyle="dark-content" backgroundColor="#fff" />
         <View style={styles.container}>
           {showStatusBar && <StatusBar barStyle={'dark-content'} />}
           <RootContainer />

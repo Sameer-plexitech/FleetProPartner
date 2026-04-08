@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Dimensions } from 'react-native';
 import { heightPixel, widthPixel } from './fonts';
 import { Text } from 'react-native';
+import CryptoJS from "crypto-js";
+const salt = CryptoJS.enc.Hex.parse("0102030405060708");
 
 // ✅ DEVICE CONSTANTS
 export const DEVICE_WIDTH = Dimensions.get('window').width;
@@ -63,11 +65,31 @@ export const _getVerticalPadding = padding => (
 );
 
 export const truncateText = (text, maxLength = 50) => {
-  if (!text) return '';
+    if (!text) return '';
 
-  return text.length > maxLength
-    ? text.substring(0, maxLength).trim() + '...'
-    : text;
+    return text.length > maxLength
+        ? text.substring(0, maxLength).trim() + '...'
+        : text;
+};
+
+export const encryptOneWay = async (value, sessionIdValue) => {
+    console.log("value==>", value, "sessionIdValue==>", sessionIdValue);
+    try {
+
+        const saltText = CryptoJS.SHA256(value).toString();
+
+        const finalHash = CryptoJS.SHA256(saltText + sessionIdValue).toString();
+
+        return finalHash;
+
+    } catch (error) {
+
+        console.log("Error in encryptOneWay:", error);
+
+        return null;
+
+    }
+
 };
 
 export const _getValidateText = (text, center) => {

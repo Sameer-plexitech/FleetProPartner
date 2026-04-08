@@ -10,20 +10,36 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import { _getVerticalPadding } from '../../utility/Helper';
 import { fontPixel, heightPixel, widthPixel } from '../../utility/fonts';
 import CommonInput from '../../components/CommonInput';
 import { useNavigation } from '@react-navigation/native';
+import Feather from 'react-native-vector-icons/Feather';
+import { secreteKeyToken, authenticateToken } from '../../apis/request';
+import { LocalStorage } from '../../utility/LocalStorage';
+import DeviceInfo from 'react-native-device-info';
 
 const Login = () => {
   const Container = Platform.OS === 'ios' ? KeyboardAvoidingView : View;
   const scrollRef = React.useRef(null);
+  const passwordInputRef = React.useRef(null);
   const [keyboardHeight, setKeyboardHeight] = React.useState(0);
   const [mobileNumber, setMobileNumber] = React.useState('');
+  const [password, setPassword] = React.useState('');
   const [mobileError, setMobileError] = React.useState('');
+  const [passwordError, setPasswordError] = React.useState('');
+  const [isPasswordVisible, setIsPasswordVisible] = React.useState(false);
   const navigation = useNavigation();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await secreteKeyToken();
+    };
+
+    fetchData();
+  }, []);
 
   const validateMobileNumber = number => {
     if (!number) {
@@ -35,6 +51,7 @@ const Login = () => {
     }
 
     return '';
+
   };
 
   const handleMobileChange = text => {
@@ -46,17 +63,76 @@ const Login = () => {
     }
   };
 
-  const handleLoginPress = () => {
-    const error = validateMobileNumber(mobileNumber);
+  const validatePassword = value => {
+    if (!value?.trim()) {
+      return 'Password is required';
+    }
 
-    if (error) {
-      setMobileError(error);
+    if (value.trim().length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+
+    return '';
+  };
+
+  const handlePasswordChange = text => {
+    setPassword(text);
+
+    if (passwordError) {
+      setPasswordError(validatePassword(text));
+    }
+  };
+
+  const handleLoginPress = async () => {
+    const mobileValidationError = validateMobileNumber(mobileNumber);
+    const passwordValidationError = validatePassword(password);
+
+    setMobileError(mobileValidationError);
+    setPasswordError(passwordValidationError);
+
+    if (mobileValidationError || passwordValidationError) {
       return;
     }
 
-    setMobileError('');
-    Keyboard.dismiss();
+    const body = {
+      "userName": mobileNumber
+    }
 
+    const response = await authenticateToken(body);
+    console.log("Login response===>", response);
+    LocalStorage.set("sessionId", response?.data?.token);
+    const uniqueId = await DeviceInfo.getUniqueId();
+    // let datas = response?.data?.payload;
+    // datas.mobile = data?.mobile;
+    let encryptedPassword = await encryptOneWay(data?.password, response?.data?.token)
+
+    let bodydata = {
+      "userName": mobileNumber,
+      "password": encryptedPassword,
+      "sessionId": response?.data?.token,
+      "assetTypeId": 2,
+      "ipAddress": "",
+      "imei": uniqueId,
+      "applicationTypeId": 6,
+      "applicationName": "WTI Driver",
+      "applicationVersion": DeviceInfo.getVersion(),
+      "osVersion": DeviceInfo.getSystemVersion(),
+      "make": 0,
+      "model": DeviceInfo.getModel(),
+      "mfgName": await DeviceInfo.getManufacturer(),
+      "dataState": "",
+      "geolocationStatus": "",
+      "browserName": "",
+      "browserVersion": "",
+      "firebaseToken": "",
+      "latitude": 0,
+      "longitude": 0,
+      "deviceTypeId": Platform.OS === 'ios' ? 1 : 2,
+    }
+
+    
+
+    Keyboard.dismiss();
     // navigation.navigate('OtpVerification', { mobileNumber });
     navigation.navigate('DrawerTabs');
   };
@@ -112,19 +188,17 @@ const Login = () => {
 
             <View style={styles.titleWrap}>
               <Text style={styles.title}>Get Started with FleetPro</Text>
-
-              {_getVerticalPadding(5)}
-
-              <Text style={styles.subtitle}>
-                Click change password to update {'\n'} new password
-              </Text>
             </View>
 
-            {_getVerticalPadding(59)}
+            {_getVerticalPadding(39)}
 
-            <Image source={require('../../assets/images/uberBlack.png')} />
+            <Image
+              source={require('../../assets/images/uberBlack.png')}
+              style={styles.uberImage}
+              resizeMode="contain"
+            />
 
-            {_getVerticalPadding(65)}
+            {_getVerticalPadding(45)}
 
             <View style={styles.formWrap}>
               <CommonInput
@@ -135,11 +209,48 @@ const Login = () => {
                 value={mobileNumber}
                 onChangeText={handleMobileChange}
                 maxLength={10}
+                returnKeyType="next"
+                autoCapitalize="none"
+                autoCorrect={false}
+                onSubmitEditing={() => passwordInputRef.current?.focus()}
               />
 
               {mobileError ? (
                 <Text style={styles.errorText}>{mobileError}</Text>
               ) : null}
+
+              <CommonInput
+                label="Password"
+                placeholder="Enter your password"
+                value={password}
+                onChangeText={handlePasswordChange}
+                secureTextEntry={!isPasswordVisible}
+                maxLength={64}
+                inputRef={passwordInputRef}
+                returnKeyType="done"
+                autoCapitalize="none"
+                autoCorrect={false}
+                onSubmitEditing={handleLoginPress}
+                rightComponent={
+                  <TouchableOpacity
+                    onPress={() => setIsPasswordVisible(prev => !prev)}
+                    style={styles.passwordEyeButton}
+                    activeOpacity={0.7}
+                  >
+                    <Feather
+                      name={isPasswordVisible ? 'eye-off' : 'eye'}
+                      size={heightPixel(18)}
+                      color="#5F5F5F"
+                    />
+                  </TouchableOpacity>
+                }
+              />
+
+              {passwordError ? (
+                <Text style={styles.errorText}>{passwordError}</Text>
+              ) : null}
+
+              {_getVerticalPadding(45)}
 
               <TouchableOpacity
                 style={styles.loginButton}
@@ -224,5 +335,13 @@ const styles = StyleSheet.create({
   footerText: {
     color: 'white',
     fontSize: fontPixel(12),
+  },
+  uberImage: {
+    height: heightPixel(150),
+    width: '100%',
+  },
+  passwordEyeButton: {
+    paddingLeft: widthPixel(8),
+    paddingVertical: 4,
   },
 });

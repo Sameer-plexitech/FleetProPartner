@@ -14,6 +14,11 @@ const CommonInput = ({
     maxLength,
     secureTextEntry = false,
     rightComponent,
+    inputRef,
+    returnKeyType,
+    onSubmitEditing,
+    autoCapitalize,
+    autoCorrect,
 }) => {
     return (
         <View style={styles.container}>
@@ -32,6 +37,7 @@ const CommonInput = ({
                 {_getHorizontalPadding(15)}
 
                 <TextInput
+                    ref={inputRef}
                     style={styles.input}
                     placeholder={placeholder}
                     placeholderTextColor="#999"
@@ -40,6 +46,10 @@ const CommonInput = ({
                     keyboardType={keyboardType}
                     maxLength={maxLength}
                     secureTextEntry={secureTextEntry}
+                    returnKeyType={returnKeyType}
+                    onSubmitEditing={onSubmitEditing}
+                    autoCapitalize={autoCapitalize}
+                    autoCorrect={autoCorrect}
                 />
 
                 {rightComponent && rightComponent}
@@ -54,7 +64,7 @@ export default CommonInput;
 
 const styles = StyleSheet.create({
     container: {
-        marginVertical: 10,
+        marginVertical: 5,
     },
     label: {
         color: '#fff',
